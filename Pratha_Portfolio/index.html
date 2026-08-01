@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Pratha Chaturvedi</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+
+  /* ==========================================================
+     THEME TOKENS
+     Dark theme lives on :root as the default. Light theme is
+     applied by toggling [data-theme="light"] on <html>, so every
+     existing component that already reads these variables
+     (cards, nav, borders, buttons, text) re-themes automatically
+     with zero changes to the rest of the CSS.
+     ========================================================== */
+  :root{
+    --bg:#0a0a0f;--bg2:#111118;--bg3:#16161f;--card:#1a1a24;
+    --border:#2a2a3a;--accent:#7c6ff7;--accent2:#5b8dee;
+    --text:#e8e8f0;--muted:#8888aa;--soft:#b0b0cc;
+    --r:12px;--r2:8px;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+    --glow:0 0 0 1px rgba(124,111,247,.25),0 0 24px rgba(124,111,247,.18);
+    --transition-theme:background-color .4s ease,color .4s ease,border-color .4s ease,box-shadow .4s ease;
+  }
+
+  html[data-theme="light"]{
+    --bg:#f7f7fb;--bg2:#ffffff;--bg3:#f0f0f8;--card:#ffffff;
+    --border:#e2e2ee;--accent:#7c6ff7;--accent2:#5b8dee;
+    --text:#1b1b26;--muted:#6b6b85;--soft:#3c3c52;
+    --shadow:0 10px 30px rgba(30,30,60,.08);
+    --glow:0 0 0 1px rgba(124,111,247,.18),0 0 24px rgba(124,111,247,.12);
+  }
+
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:16px;line-height:1.7;transition:var(--transition-theme);position:relative;overflow-x:hidden}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  *{transition:background-color .4s ease,border-color .4s ease,color .3s ease}
+
+  /* ==========================================================
+     PAGE LOAD REVEAL
+     ========================================================== */
+  body.loading{overflow:hidden}
+  body:not(.loading) #hero .reveal-el{animation:heroReveal .8s cubic-bezier(.16,1,.3,1) both}
+  #hero .reveal-el:nth-child(1){animation-delay:.05s}
+  #hero .reveal-el:nth-child(2){animation-delay:.15s}
+  #hero .reveal-el:nth-child(3){animation-delay:.25s}
+  #hero .reveal-el:nth-child(4){animation-delay:.35s}
+  #hero .reveal-el:nth-child(5){animation-delay:.45s}
+  #hero .reveal-el:nth-child(6){animation-delay:.55s}
+  @keyframes heroReveal{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ==========================================================
+     BACKGROUND EFFECT — subtle aurora mesh
+     Fixed, behind all content, low-contrast, GPU-friendly
+     (blurred radial gradients drifting slowly). No canvas/JS
+     needed, so it stays lightweight.
+     ========================================================== */
+  .aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+  .aurora span{position:absolute;border-radius:50%;filter:blur(70px);opacity:.35;will-change:transform}
+  .aurora span:nth-child(1){width:38vw;height:38vw;top:-10%;left:-8%;background:radial-gradient(circle,var(--accent),transparent 70%);animation:auroraDrift1 22s ease-in-out infinite}
+  .aurora span:nth-child(2){width:30vw;height:30vw;bottom:-12%;right:-6%;background:radial-gradient(circle,var(--accent2),transparent 70%);animation:auroraDrift2 26s ease-in-out infinite}
+  .aurora span:nth-child(3){width:24vw;height:24vw;top:40%;left:55%;background:radial-gradient(circle,var(--accent),transparent 70%);animation:auroraDrift3 30s ease-in-out infinite}
+  html[data-theme="light"] .aurora span{opacity:.18}
+  @keyframes auroraDrift1{0%,100%{transform:translate(0,0)}50%{transform:translate(6vw,8vh)}}
+  @keyframes auroraDrift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-7vw,-6vh)}}
+  @keyframes auroraDrift3{0%,100%{transform:translate(0,0)}50%{transform:translate(-5vw,7vh)}}
+  @media(prefers-reduced-motion:reduce){
+    .aurora span{animation:none}
+    *{scroll-behavior:auto!important}
+  }
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:99;background:rgba(10,10,15,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:.75rem 2rem;display:flex;align-items:center;justify-content:space-between;transition:var(--transition-theme)}
+  html[data-theme="light"] nav{background:rgba(255,255,255,.85)}
+  .nav-name{font-weight:700;font-size:1.1rem;letter-spacing:.5px;color:var(--text)}
+  .nav-links{display:flex;gap:1.5rem;align-items:center}
+  .nav-links a{color:var(--muted);font-size:.9rem;transition:color .2s}
+  .nav-links a:hover{color:var(--accent);text-decoration:none}
+  .nav-right{display:flex;align-items:center;gap:1rem}
+
+  /* Resume download button (shared style, used in nav + hero) */
+  .btn-resume{display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1.1rem;border-radius:var(--r2);font-size:.85rem;font-weight:600;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}
+  .btn-resume:hover{transform:translateY(-2px) scale(1.03);box-shadow:var(--glow);text-decoration:none;color:#fff}
+  .btn-resume i{font-size:1rem}
+  .btn-resume.large{padding:.65rem 1.4rem;font-size:.9rem}
+
+  /* Theme toggle switch */
+  .theme-toggle{position:relative;width:52px;height:28px;border-radius:100px;background:var(--bg3);border:1px solid var(--border);cursor:pointer;flex-shrink:0}
+  .theme-toggle .knob{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;transition:left .3s cubic-bezier(.4,0,.2,1);color:#fff;font-size:.7rem}
+  html[data-theme="light"] .theme-toggle .knob{left:26px}
+  .theme-toggle i{pointer-events:none}
+
+  /* SECTIONS */
+  section{padding:5rem 2rem;max-width:900px;margin:auto}
+  .section-label{font-size:.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem;font-weight:600}
+  h2{font-size:2rem;font-weight:700;margin-bottom:2rem;color:var(--text)}
+
+  /* Scroll-reveal utility (used across new + existing sections) */
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+  .reveal.in-view{opacity:1;transform:translateY(0)}
+  .reveal-stagger.in-view{transition-delay:calc(var(--i,0) * 90ms)}
+  .section-label.reveal,h2.reveal{transform:translateY(14px)}
+
+  /* HERO */
+  #hero{min-height:90vh;display:flex;flex-direction:column;justify-content:center;padding-top:2rem;padding-bottom:2rem;max-width:900px;margin:auto}
+  .hero-tag{display:inline-block;background:rgba(124,111,247,.15);color:var(--accent);border:1px solid rgba(124,111,247,.3);border-radius:100px;padding:.3rem .9rem;font-size:.8rem;margin-bottom:1.5rem;font-weight:500}
+  .hero-name{font-size:clamp(2.5rem,6vw,4rem);font-weight:800;line-height:1.1;margin-bottom:1rem;letter-spacing:-1px}
+  .hero-name span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .hero-role{font-size:1.1rem;color:var(--soft);margin-bottom:1rem;font-weight:500}
+  .hero-intro{color:var(--muted);max-width:620px;margin-bottom:2rem;font-size:1rem}
+  .btn-group{display:flex;gap:1rem;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.4rem;border-radius:var(--r2);font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;border:none}
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-primary:hover{background:#6a5ee0;text-decoration:none;color:#fff;transform:translateY(-2px) scale(1.03)}
+  .btn-ghost{background:transparent;color:var(--soft);border:1px solid var(--border)}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent);text-decoration:none;transform:translateY(-2px) scale(1.03)}
+  .hero-dots{display:flex;gap:1.5rem;margin-top:3rem}
+  .dot-stat{text-align:center}
+  .dot-stat .num{font-size:1.6rem;font-weight:800;color:var(--accent)}
+  .dot-stat .lbl{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+
+  /* ABOUT */
+  #about .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+  .about-text{color:var(--soft);line-height:1.8}
+  .info-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;box-shadow:var(--shadow)}
+  .info-row{display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border)}
+  .info-row:last-child{border-bottom:none}
+  .info-row i{color:var(--accent);font-size:1.1rem}
+  .info-row .k{font-size:.8rem;color:var(--muted);min-width:80px}
+  .info-row .v{font-size:.9rem;color:var(--text)}
+
+  /* SKILLS */
+  #skills .skill-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.25rem}
+  .skill-group{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+  .skill-group:hover{transform:translateY(-4px);box-shadow:var(--glow);border-color:var(--accent)}
+  .skill-group-title{font-size:.75rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:.85rem;font-weight:600}
+  .skill-chips{display:flex;flex-wrap:wrap;gap:.5rem}
+  .chip{background:rgba(124,111,247,.1);color:var(--soft);border:1px solid rgba(124,111,247,.2);border-radius:100px;padding:.25rem .7rem;font-size:.8rem}
+
+  /* EDUCATION */
+  #education .edu-list{display:flex;flex-direction:column;gap:1.25rem}
+  .edu-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;display:flex;gap:1.25rem;align-items:flex-start;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+  .edu-card:hover{transform:translateY(-4px);box-shadow:var(--glow);border-color:var(--accent)}
+  .edu-icon{width:44px;height:44px;border-radius:var(--r2);background:rgba(124,111,247,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .edu-icon i{color:var(--accent);font-size:1.3rem}
+  .edu-degree{font-weight:700;font-size:1rem;margin-bottom:.2rem}
+  .edu-uni{color:var(--soft);font-size:.9rem;margin-bottom:.4rem}
+  .edu-score{display:inline-block;background:rgba(91,141,238,.15);color:var(--accent2);border:1px solid rgba(91,141,238,.3);border-radius:100px;padding:.15rem .7rem;font-size:.78rem;font-weight:600}
+
+  /* ==========================================================
+     EXPERIENCE — vertical timeline
+     ========================================================== */
+  #experience .timeline{position:relative;display:flex;flex-direction:column;gap:2rem;padding-left:2.25rem}
+  #experience .timeline::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:linear-gradient(var(--accent),var(--accent2));opacity:.35}
+  .timeline-item{position:relative}
+  .timeline-dot{position:absolute;left:-2.25rem;top:1.6rem;width:20px;height:20px;border-radius:50%;background:var(--bg);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px var(--bg)}
+  .timeline-dot i{font-size:.65rem;color:var(--accent)}
+  .exp-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;display:flex;gap:1.25rem;align-items:flex-start;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+  .exp-card:hover{transform:translateY(-4px);box-shadow:var(--glow);border-color:var(--accent)}
+  .exp-icon{width:44px;height:44px;border-radius:var(--r2);background:rgba(124,111,247,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .exp-icon i{color:var(--accent);font-size:1.3rem}
+  .exp-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:.5rem;margin-bottom:.35rem}
+  .exp-position{font-weight:700;font-size:1rem}
+  .exp-duration{font-size:.78rem;color:var(--muted);background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:.15rem .65rem;white-space:nowrap}
+  .exp-org{color:var(--soft);font-size:.9rem;margin-bottom:.6rem}
+  .exp-desc{color:var(--muted);font-size:.88rem;line-height:1.7;margin-bottom:.75rem}
+  .exp-desc ul{padding-left:1.1rem;display:flex;flex-direction:column;gap:.25rem}
+  .exp-tags{display:flex;flex-wrap:wrap;gap:.4rem}
+  .exp-tag{background:rgba(255,255,255,.05);color:var(--muted);border-radius:4px;padding:.15rem .5rem;font-size:.75rem;font-family:monospace}
+  html[data-theme="light"] .exp-tag{background:rgba(0,0,0,.04)}
+
+  /* PROJECTS */
+  #projects .proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem}
+  .proj-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;display:flex;flex-direction:column;gap:.75rem;transition:border-color .2s,transform .2s,box-shadow .2s}
+  .proj-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--glow)}
+  .proj-icon{width:40px;height:40px;border-radius:var(--r2);background:rgba(124,111,247,.15);display:flex;align-items:center;justify-content:center;margin-bottom:.25rem}
+  .proj-icon i{color:var(--accent);font-size:1.2rem}
+  .proj-title{font-weight:700;font-size:1rem}
+  .proj-desc{color:var(--muted);font-size:.88rem;line-height:1.6;flex:1}
+  .proj-tags{display:flex;flex-wrap:wrap;gap:.4rem}
+  .proj-tag{background:rgba(255,255,255,.05);color:var(--muted);border-radius:4px;padding:.15rem .5rem;font-size:.75rem;font-family:monospace}
+  html[data-theme="light"] .proj-tag{background:rgba(0,0,0,.04)}
+
+  /* ==========================================================
+     ACHIEVEMENTS
+     ========================================================== */
+  #achievements .ach-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.25rem}
+  .ach-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;text-align:center;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+  .ach-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:var(--glow);border-color:var(--accent)}
+  .ach-icon{width:52px;height:52px;margin:0 auto .9rem;border-radius:50%;background:rgba(124,111,247,.15);display:flex;align-items:center;justify-content:center}
+  .ach-icon i{color:var(--accent);font-size:1.5rem}
+  .ach-title{font-weight:700;font-size:.95rem;margin-bottom:.3rem}
+  .ach-sub{color:var(--muted);font-size:.82rem}
+
+  /* OBJECTIVE */
+  #objective .obj-box{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r);padding:1.75rem;color:var(--soft);font-size:1rem;line-height:1.8;font-style:italic}
+
+  /* CONTACT */
+  #contact .contact-grid{display:flex;gap:1rem;flex-wrap:wrap}
+  .contact-btn{display:inline-flex;align-items:center;gap:.6rem;background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:.75rem 1.25rem;color:var(--soft);font-size:.9rem;transition:all .2s;cursor:pointer}
+  .contact-btn:hover{border-color:var(--accent);color:var(--accent);text-decoration:none;transform:translateY(-2px) scale(1.03)}
+  .contact-btn i{font-size:1.1rem}
+
+  /* ==========================================================
+     FOOTER + VISITOR COUNTER
+     ========================================================== */
+  footer{text-align:center;padding:2.5rem 2rem 2rem;color:var(--muted);font-size:.82rem;border-top:1px solid var(--border)}
+  .visitor-counter{display:inline-flex;align-items:center;gap:.6rem;background:var(--card);border:1px solid var(--border);border-radius:100px;padding:.5rem 1.1rem;margin-bottom:1rem;font-size:.85rem;color:var(--soft)}
+  .visitor-counter i{color:var(--accent);font-size:1rem}
+  .visitor-counter .count{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+
+  /* DIVIDER */
+  .divider{height:1px;background:var(--border);max-width:900px;margin:0 auto}
+
+  @media(max-width:640px){
+    #about .about-grid{grid-template-columns:1fr}
+    nav{padding:.75rem 1rem}
+    .nav-links{gap:.85rem}
+    .nav-links a{display:none}
+    section{padding:3.5rem 1rem}
+    h2{font-size:1.5rem}
+    .btn-resume span.btn-label{display:none}
+    #experience .timeline{padding-left:1.75rem}
+    .timeline-dot{left:-1.75rem}
+  }
+</style>
+</head>
+<body class="loading">
+
+<!-- Ambient animated aurora background (decorative, non-interactive) -->
+<div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+
+<nav>
+  <span class="nav-name">PC</span>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#skills">Skills</a>
+      <a href="#education">Education</a>
+      <a href="#experience">Experience</a>
+      <a href="#projects">Projects</a>
+      <a href="#achievements">Achievements</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <!-- Resume download (nav) -->
+    <a href="Pratha_chaturvedi.pdf" download class="btn-resume"><i class="ti ti-download" aria-hidden="true"></i><span class="btn-label">Resume</span></a>
+    <!-- Dark / light theme switch -->
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle light and dark theme" aria-pressed="false">
+      <span class="knob"><i class="ti ti-moon" id="themeIcon" aria-hidden="true"></i></span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-tag reveal-el">Available for opportunities</div>
+  <h1 class="hero-name reveal-el">Pratha<br><span>Chaturvedi</span></h1>
+  <p class="hero-role reveal-el">MCA Student &nbsp;·&nbsp; Backend &amp; Flask Developer &nbsp;·&nbsp; ML Enthusiast</p>
+  <p class="hero-intro reveal-el">Building scalable Flask web apps and AI-driven solutions that tackle real-world problems. Currently pursuing MCA at Banasthali Vidyapeeth.</p>
+  <div class="btn-group reveal-el">
+    <a href="#projects" class="btn btn-primary"><i class="ti ti-layout-grid"></i> View Projects</a>
+    <a href="#contact" class="btn btn-ghost"><i class="ti ti-mail"></i> Contact Me</a>
+    <!-- Resume download (hero) -->
+    <a href="resume.pdf" download class="btn-resume large"><i class="ti ti-download" aria-hidden="true"></i><span>Download Resume</span></a>
+  </div>
+  <div class="hero-dots reveal-el">
+    <div class="dot-stat"><div class="num" data-counter data-target="94.7" data-suffix="%">0%</div><div class="lbl">MCA Score</div></div>
+    <div class="dot-stat"><div class="num" data-counter data-target="3" data-suffix="+">0+</div><div class="lbl">Projects</div></div>
+    <div class="dot-stat"><div class="num" data-counter data-target="10" data-suffix="+">0+</div><div class="lbl">Technologies</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ABOUT -->
+<section id="about">
+  <p class="section-label reveal">Who I am</p>
+  <h2 class="reveal">About Me</h2>
+  <div class="about-grid">
+    <p class="about-text reveal">I am an MCA student at Banasthali Vidyapeeth with a strong interest in backend development, machine learning, and problem-solving. I enjoy building scalable web applications using Flask and working on AI-based projects that solve real-world problems. I am passionate about learning new technologies and continuously improving my development skills.</p>
+    <div class="info-card reveal">
+      <div class="info-row"><i class="ti ti-user" aria-hidden="true"></i><span class="k">Name</span><span class="v">Pratha Chaturvedi</span></div>
+      <div class="info-row"><i class="ti ti-school" aria-hidden="true"></i><span class="k">Degree</span><span class="v">MCA – Banasthali Vidyapeeth</span></div>
+      <div class="info-row"><i class="ti ti-code" aria-hidden="true"></i><span class="k">Focus</span><span class="v">Backend &amp; Machine Learning</span></div>
+      <div class="info-row"><i class="ti ti-map-pin" aria-hidden="true"></i><span class="k">Location</span><span class="v">India</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <p class="section-label reveal">What I know</p>
+  <h2 class="reveal">Skills</h2>
+  <div class="skill-groups">
+    <div class="skill-group reveal reveal-stagger" style="--i:0">
+      <div class="skill-group-title">Languages</div>
+      <div class="skill-chips">
+        <span class="chip">Python</span><span class="chip">Java</span><span class="chip">C#</span><span class="chip">JavaScript</span><span class="chip">SQL</span>
+      </div>
+    </div>
+    <div class="skill-group reveal reveal-stagger" style="--i:1">
+      <div class="skill-group-title">Web Development</div>
+      <div class="skill-chips">
+        <span class="chip">Flask</span><span class="chip">HTML5</span><span class="chip">CSS3</span><span class="chip">REST APIs</span><span class="chip">Jinja</span>
+      </div>
+    </div>
+    <div class="skill-group reveal reveal-stagger" style="--i:2">
+      <div class="skill-group-title">Database &amp; Tools</div>
+      <div class="skill-chips">
+        <span class="chip">SQLAlchemy</span><span class="chip">MySQL</span><span class="chip">Git</span><span class="chip">GitHub</span>
+      </div>
+    </div>
+    <div class="skill-group reveal reveal-stagger" style="--i:3">
+      <div class="skill-group-title">Machine Learning</div>
+      <div class="skill-chips">
+        <span class="chip">TensorFlow</span><span class="chip">Classification</span><span class="chip">Regression</span><span class="chip">Data Preprocessing</span>
+      </div>
+    </div>
+    <div class="skill-group reveal reveal-stagger" style="--i:4">
+      <div class="skill-group-title">Other</div>
+      <div class="skill-chips">
+        <span class="chip">DSA</span><span class="chip">Problem Solving</span><span class="chip">Debugging</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- EDUCATION -->
+<section id="education">
+  <p class="section-label reveal">Academic background</p>
+  <h2 class="reveal">Education</h2>
+  <div class="edu-list">
+    <div class="edu-card reveal">
+      <div class="edu-icon"><i class="ti ti-building-community" aria-hidden="true"></i></div>
+      <div>
+        <div class="edu-degree">Master of Computer Applications (MCA)</div>
+        <div class="edu-uni">Banasthali Vidyapeeth</div>
+        <span class="edu-score">Aggregate: 94.7%</span>
+      </div>
+    </div>
+    <div class="edu-card reveal">
+      <div class="edu-icon"><i class="ti ti-building" aria-hidden="true"></i></div>
+      <div>
+        <div class="edu-degree">Bachelor of Computer Applications (BCA)</div>
+        <div class="edu-uni">GLA University</div>
+        <span class="edu-score">Aggregate: 83.3%</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ==========================================================
+     EXPERIENCE
+     Timeline of roles / hackathon participation, placed between
+     Education and Projects as requested.
+     ========================================================== -->
+<section id="experience">
+  <p class="section-label reveal">Where I've contributed</p>
+  <h2 class="reveal">Experience</h2>
+  <div class="timeline">
+    <div class="timeline-item reveal">
+      <div class="timeline-dot"><i class="ti ti-point-filled" aria-hidden="true"></i></div>
+      <div class="exp-card">
+        <div class="exp-icon"><i class="ti ti-users-group" aria-hidden="true"></i></div>
+        <div>
+          <div class="exp-head">
+            <span class="exp-position">Subcore Member</span>
+            <span class="exp-duration">2026</span>
+          </div>
+          <div class="exp-org">Mayukh 2026 Technical Team</div>
+          <div class="exp-desc">
+            <ul>
+              <li>Coordinated technical workshops</li>
+              <li>Assisted in event management</li>
+              <li>Worked with organizing committee</li>
+              <li>Managed participant support</li>
+            </ul>
+          </div>
+          <div class="exp-tags">
+            <span class="exp-tag">Event Management</span><span class="exp-tag">Coordination</span><span class="exp-tag">Teamwork</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="timeline-item reveal">
+      <div class="timeline-dot"><i class="ti ti-point-filled" aria-hidden="true"></i></div>
+      <div class="exp-card">
+        <div class="exp-icon"><i class="ti ti-bulb" aria-hidden="true"></i></div>
+        <div>
+          <div class="exp-head">
+            <span class="exp-position">Smart India Hackathon Participant</span>
+            <span class="exp-duration">2026</span>
+          </div>
+          <div class="exp-org">Smart India Hackathon</div>
+          <div class="exp-desc">Worked on an AI-powered Dropout Prediction and Counselling System using Machine Learning and Flask.</div>
+          <div class="exp-tags">
+            <span class="exp-tag">Machine Learning</span><span class="exp-tag">Flask</span><span class="exp-tag">Python</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <p class="section-label reveal">What I've built</p>
+  <h2 class="reveal">Projects</h2>
+  <div class="proj-grid">
+    <div class="proj-card reveal reveal-stagger" style="--i:0">
+      <div class="proj-icon"><i class="ti ti-stethoscope" aria-hidden="true"></i></div>
+      <div class="proj-title">Skin Cancer Detection System</div>
+      <p class="proj-desc">A machine learning web app using Flask and TensorFlow to detect skin cancer from uploaded images via CNN models.</p>
+      <div class="proj-tags">
+        <span class="proj-tag">Flask</span><span class="proj-tag">TensorFlow</span><span class="proj-tag">CNN</span><span class="proj-tag">Python</span>
+      </div>
+    </div>
+    <div class="proj-card reveal reveal-stagger" style="--i:1">
+      <div class="proj-icon"><i class="ti ti-books" aria-hidden="true"></i></div>
+      <div class="proj-title">eLibrary Management System</div>
+      <p class="proj-desc">A complete eLibrary platform with authentication, book search, borrow/return functionality, and admin management.</p>
+      <div class="proj-tags">
+        <span class="proj-tag">Flask</span><span class="proj-tag">SQLAlchemy</span><span class="proj-tag">MySQL</span><span class="proj-tag">Auth</span>
+      </div>
+    </div>
+    <div class="proj-card reveal reveal-stagger" style="--i:2">
+      <div class="proj-icon"><i class="ti ti-search" aria-hidden="true"></i></div>
+      <div class="proj-title">Search &amp; Saved Queries App</div>
+      <p class="proj-desc">A Flask app with user authentication, search filtering, API handling, and saved searches functionality.</p>
+      <div class="proj-tags">
+        <span class="proj-tag">Flask</span><span class="proj-tag">REST API</span><span class="proj-tag">Auth</span><span class="proj-tag">Python</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ==========================================================
+     ACHIEVEMENTS
+     ========================================================== -->
+<section id="achievements">
+  <p class="section-label reveal">Milestones</p>
+  <h2 class="reveal">Achievements</h2>
+  <div class="ach-grid">
+    <div class="ach-card reveal reveal-stagger" style="--i:0">
+      <div class="ach-icon"><i class="ti ti-trophy" aria-hidden="true"></i></div>
+      <div class="ach-title">MCA Aggregate</div>
+      <div class="ach-sub">94.7%</div>
+    </div>
+    <div class="ach-card reveal reveal-stagger" style="--i:1">
+      <div class="ach-icon"><i class="ti ti-trophy" aria-hidden="true"></i></div>
+      <div class="ach-title">BCA Aggregate</div>
+      <div class="ach-sub">83.3%</div>
+    </div>
+    <div class="ach-card reveal reveal-stagger" style="--i:2">
+      <div class="ach-icon"><i class="ti ti-trophy" aria-hidden="true"></i></div>
+      <div class="ach-title">Smart India Hackathon</div>
+      <div class="ach-sub">Participant</div>
+    </div>
+    <div class="ach-card reveal reveal-stagger" style="--i:3">
+      <div class="ach-icon"><i class="ti ti-trophy" aria-hidden="true"></i></div>
+      <div class="ach-title">Backend &amp; ML</div>
+      <div class="ach-sub">Enthusiast</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CAREER OBJECTIVE -->
+<section id="objective">
+  <p class="section-label reveal">My goal</p>
+  <h2 class="reveal">Career Objective</h2>
+  <div class="obj-box reveal">"Aspiring software developer seeking opportunities to apply backend development and machine learning skills in real-world projects — while continuously learning and contributing to impactful solutions."</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <p class="section-label reveal">Get in touch</p>
+  <h2 class="reveal">Contact</h2>
+  <p style="color:var(--muted);margin-bottom:1.5rem" class="reveal">I'm open to internships, collaborations, and full-time opportunities. Feel free to reach out!</p>
+  <div class="contact-grid reveal">
+    <a href="mailto:prathachaturvedi6666@gmail.com" class="contact-btn"><i class="ti ti-mail" aria-hidden="true"></i> Email Me</a>
+    <a href="https://github.com/Pratha1210" target="_blank" class="contact-btn"><i class="ti ti-brand-github" aria-hidden="true"></i> GitHub</a>
+    <a href="https://www.linkedin.com/in/pratha-chaturvedi-774485276/" target="_blank" class="contact-btn"><i class="ti ti-brand-linkedin" aria-hidden="true"></i> LinkedIn</a>
+    <a href="resume.pdf" download class="contact-btn"><i class="ti ti-download" aria-hidden="true"></i> Download Resume</a>
+  </div>
+</section>
+
+<footer>
+  <!-- Visitor counter: uses localStorage as a client-side demo counter -->
+  <div class="visitor-counter">
+    <i class="ti ti-eye" aria-hidden="true"></i>
+    <span>Visitors</span>
+    <span class="count" id="visitorCount">0</span>
+  </div>
+  <p>Designed &amp; built by Pratha Chaturvedi &nbsp;·&nbsp; 2025</p>
+</footer>
+
+<script>
+/* ==========================================================
+   THEME SWITCH (dark / light) — persisted in localStorage
+   ========================================================== */
+(function initTheme(){
+  const root = document.documentElement;
+  const stored = localStorage.getItem('portfolio-theme');
+  const preferredLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+  const theme = stored || (preferredLight ? 'light' : 'dark');
+  root.setAttribute('data-theme', theme);
+
+  const toggle = document.getElementById('themeToggle');
+  const icon = document.getElementById('themeIcon');
+
+  function reflectIcon(t){
+    icon.className = t === 'light' ? 'ti ti-sun' : 'ti ti-moon';
+    toggle.setAttribute('aria-pressed', String(t === 'light'));
+  }
+  reflectIcon(theme);
+
+  toggle.addEventListener('click', function(){
+    const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('portfolio-theme', next);
+    reflectIcon(next);
+  });
+})();
+
+/* ==========================================================
+   SCROLL REVEAL ANIMATIONS — IntersectionObserver
+   Applies to any element with the `.reveal` class (cards,
+   section titles, timeline items, achievement cards, etc).
+   ========================================================== */
+(function initScrollReveal(){
+  const items = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window) || items.length === 0){
+    items.forEach(el => el.classList.add('in-view'));
+    return;
+  }
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting){
+        entry.target.classList.add('in-view');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+  items.forEach(el => observer.observe(el));
+})();
+
+/* ==========================================================
+   COUNTER ANIMATION — animates hero stat numbers on load
+   ========================================================== */
+(function initCounters(){
+  const counters = document.querySelectorAll('[data-counter]');
+  counters.forEach(el => {
+    const target = parseFloat(el.getAttribute('data-target'));
+    const suffix = el.getAttribute('data-suffix') || '';
+    const isDecimal = String(target).includes('.');
+    const duration = 1400;
+    let start = null;
+
+    function step(ts){
+      if (start === null) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); /* ease-out cubic */
+      const value = target * eased;
+      el.textContent = (isDecimal ? value.toFixed(1) : Math.round(value)) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+})();
+
+/* ==========================================================
+   VISITOR COUNTER — real, shared count across all visitors.
+   Uses CountAPI (https://countapi.xyz), a free public hit-counter
+   service: every page load calls its "hit" endpoint, which
+   atomically increments a value stored on their server and
+   returns the new total, so the number is the same for every
+   visitor on every device (not just this browser).
+
+   NAMESPACE/KEY: scoped to this site's hostname so the counter
+   is unique per deployment. If you move the site to a new
+   domain and want to keep the same running total, hardcode
+   NAMESPACE to a fixed string instead of using location.hostname.
+
+   FALLBACK: if the API can't be reached (offline, ad-blocker,
+   the free service being down, or opening the file locally via
+   file:// where hostname is empty), we fall back to a
+   localStorage-based per-browser demo count so the UI never
+   breaks.
+   ========================================================== */
+(function initVisitorCounter(){
+  const NAMESPACE = 'pratha-chaturvedi-portfolio-' + (location.hostname || 'local').replace(/[^a-z0-9-]/gi, '-');
+  const KEY = 'visits';
+  const API_URL = `https://api.countapi.xyz/hit/${NAMESPACE}/${KEY}`;
+
+  const el = document.getElementById('visitorCount');
+
+  function animateTo(count){
+    const start = Math.max(count - 40, 0); /* animate up from a nearby number */
+    const duration = 1200;
+    let startTime = null;
+    function step(ts){
+      if (startTime === null) startTime = ts;
+      const progress = Math.min((ts - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const value = Math.round(start + (count - start) * eased);
+      el.textContent = value.toLocaleString();
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function fallbackLocalCount(){
+    const LOCAL_KEY = 'portfolio-visitor-count-fallback';
+    const SESSION_KEY = 'portfolio-visitor-session';
+    let count = parseInt(localStorage.getItem(LOCAL_KEY), 10);
+    if (isNaN(count)) count = 0; /* baseline demo value */
+    if (!sessionStorage.getItem(SESSION_KEY)){
+      count += 1;
+      localStorage.setItem(LOCAL_KEY, String(count));
+      sessionStorage.setItem(SESSION_KEY, '1');
+    }
+    animateTo(count);FileSystemFileEntry
+  }
+
+  /* Give the API a hard timeout so a slow/unreachable request
+     never leaves the counter stuck. */
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 4000);
+
+  fetch(API_URL, { signal: controller.signal })
+    .then(res => {
+      if (!res.ok) throw new Error('CountAPI request failed');
+      return res.json();
+    })
+    .then(data => {
+      clearTimeout(timeout);
+      if (typeof data.value === 'number') {
+        animateTo(data.value);
+      } else {
+        fallbackLocalCount();
+      }
+    })
+    .catch(() => {
+      clearTimeout(timeout);
+      fallbackLocalCount();
+    });
+})();
+
+/* ==========================================================
+   PAGE LOAD — remove loading class so hero reveal animation
+   plays once, right after first paint.
+   ========================================================== */
+window.addEventListener('load', function(){
+  requestAnimationFrame(() => document.body.classList.remove('loading'));
+});
+</script>
+
+</body>
+</html>
